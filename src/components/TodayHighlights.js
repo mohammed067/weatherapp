@@ -31,7 +31,7 @@ const TodayHighlights = ({ data }) => {
         )}
         <div className="p-4 rounded-lg shadow-sm">
           <h3 className="text-lg font-semibold mb-2 text-[#9399A2]">Weather</h3>
-          <p className="text-[#9399A2]">{weather[0].description}</p>
+          <p className="font-semibold text-[1.6rem] text-white min-w-max">{weather[0].description}</p>
         </div>
       </div>
     </div>

@@ -1,16 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
-const API_KEY = '94f129892a1969884db8597ac5aee1f7'; 
+const API_KEY = '94f129892a1969884db8597ac5aee1f7';
 
 const WeeklyForecast = ({ city, userType }) => {
   const [weeklyForecast, setWeeklyForecast] = useState([]);
 
-  useEffect(() => {
-    fetchWeeklyForecast(city);
-  }, [city]);
-
-  const fetchWeeklyForecast = async (city) => {
+  const fetchWeeklyForecast = useCallback(async (city) => {
     try {
       const response = await axios.get(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric`);
       const dailyData = parseDailyForecast(response.data.list);
@@ -18,14 +14,18 @@ const WeeklyForecast = ({ city, userType }) => {
     } catch (error) {
       console.error('Error fetching weekly forecast', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchWeeklyForecast(city);
+  }, [city, fetchWeeklyForecast]);
 
   const parseDailyForecast = (forecastList) => {
     const dailyData = [];
     let currentDate = null;
 
     forecastList.forEach(item => {
-      const date = item.dt_txt.split(' ')[0]; 
+      const date = item.dt_txt.split(' ')[0];
       if (date !== currentDate) {
         const { dt_txt, main, weather, wind } = item;
         dailyData.push({
@@ -55,11 +55,11 @@ const WeeklyForecast = ({ city, userType }) => {
     <div className="mt-8 font-gilroy bg-[#202B3B] rounded-md p-[2rem] ">
       <h2 className="text-2xl font-semibold mb-4 text-[#9399A2] ">Weekly Forecast</h2>
       {weeklyForecast.map((day, index) => (
-        <div key={index} className="mb-4 p-4 rounded-lg border-b shadow-sm gap-6 bg-[#202B3B] grid grid-cols-6">
-          <p className="font-semibold text-white text-[1rem] col-span-2">{new Date(day.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
-          <p className="text-[#9399A2] col-span-2">{day.weather}</p>
-          <p className="mt-1 text-[#9399A2] col-span-2">{day.temperature} °C</p>
-        
+        <div key={index} className="mb-4 p-4 rounded-lg border-b-[0.2px] shadow-sm gap-6 bg-[#202B3B] grid grid-cols-6">
+          <p className="font-semibold text-[#9399A2] text-[1rem] col-span-2">{new Date(day.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+          <p className=" col-span-2 text-white ">{day.weather}</p>
+          <p className="mt-1 text-white col-span-2 text-[1.2rem] lg:text-[1.5rem]">{day.temperature} °C</p>
+
           <p className="text-[#9399A2] col-span-4 font-bold min-w-max text-[1.3rem] mt-2">{activitySuggestion(day.temperature, day.weather)}</p>
         </div>
       ))}

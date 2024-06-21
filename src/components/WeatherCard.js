@@ -5,7 +5,7 @@ import rainIcon from "../icons/rain.png";
 
 function WeatherCard({ data, userType }) {
   const { name, main, weather, dt } = data;
-  
+
   const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const currentDate = new Date(dt * 1000);
   const currentDay = daysOfWeek[currentDate.getDay()];
@@ -20,7 +20,7 @@ function WeatherCard({ data, userType }) {
     }
   };
 
-  
+
   let weatherIcon;
   switch (weather[0].main) {
     case 'Clear':
@@ -31,6 +31,9 @@ function WeatherCard({ data, userType }) {
       break;
     case 'Rain':
       weatherIcon = rainIcon;
+      break;
+    case 'Haze':
+      weatherIcon = fogIcon;
       break;
     default:
       weatherIcon = null;

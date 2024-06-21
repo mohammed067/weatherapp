@@ -3,19 +3,24 @@ import axios from 'axios';
 import WeatherCard from './components/WeatherCard';
 import PersonalStory from './components/PersonalStory';
 import WeeklyForecast from './components/WeeklyForecast';
-import UserSelector from './components/UserSelecter';
+import UserSelector from './components/UserSelecter'
 import TodayHighlights from './components/TodayHighlights';
+
 import "../src/fonts/transfonter/stylesheet.css"
 import "../src/fonts/circular/stylesheet.css"
+import CitySuggestions from './components/CitySuggestions';
 
-const API_KEY = '94f129892a1969884db8597ac5aee1f7'; 
+const API_KEY = '94f129892a1969884db8597ac5aee1f7';
 const WIKIPEDIA_API_URL = 'https://en.wikipedia.org/w/api.php';
+const CITIES_API_URL = 'https://countriesnow.space/api/v0.1/countries/population/cities';
 
 function App() {
   const [weatherData, setWeatherData] = useState(null);
-  const [city, setCity] = useState('London');
+  const [city, setCity] = useState('Hyderabad');
   const [userType, setUserType] = useState('traveler');
   const [cityInfo, setCityInfo] = useState('');
+  const [cities, setCities] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
 
   useEffect(() => {
     if (city.trim() !== '') {
@@ -24,13 +29,17 @@ function App() {
     }
   }, [city]);
 
+  useEffect(() => {
+    fetchCities();
+  }, []);
+
   const fetchWeatherData = async (city) => {
     try {
       const response = await axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`);
       setWeatherData(response.data);
     } catch (error) {
       console.error('Error fetching weather data', error);
-      setWeatherData(null); 
+      setWeatherData(null);
     }
   };
 
@@ -50,7 +59,7 @@ function App() {
 
       const pages = response.data.query.pages;
       const pageId = Object.keys(pages)[0];
-      const title = pages[pageId].title; 
+      const title = pages[pageId].title;
       const extract = pages[pageId].extract;
 
       if (title.toLowerCase() === city.toLowerCase()) {
@@ -68,43 +77,72 @@ function App() {
     }
   };
 
-  return (
-    <div className='flex justify-center bg-[#0B131E]  font-gilroy'>
-      <div className='2xl:max-w-[1600px]'>
-      <div className="px-[1rem] md:px-[4rem] py-[2rem] bg-[#0B131E]">
-      <h1 className="text-4xl font-bold mb-10 text-[#DDE0E4]  ">Weather Dashboard</h1>
-     
-      <div className='lg:grid grid-cols-8 gap-5'>
-        <div className='col-span-5'>
-          <UserSelector setUserType={setUserType} />
-          <input 
-            type="text" 
-            value={city} 
-            onChange={(e) => setCity(e.target.value)} 
-            placeholder="Enter city" 
-            className="p-2 text-[#9399A2] rounded-lg shadow-sm focus:ring mt-4 bg-[#202B3B] focus:ring-blue-300 w-full mb-6"
-          />
-          <PersonalStory/>
-          {weatherData && (
-            <WeatherCard data={weatherData} userType={userType} />
-          )}
-           <TodayHighlights data={weatherData} />
-          <div className="mt-4 bg-[#202B3B] p-[2rem] rounded-md">
-            <h2 className="text-xl font-semibold mb-2 text-[#9399A2]">About {city}</h2>
-            <p className='text-[#9399A2]'>{cityInfo}</p>
-          </div>
-         
-        </div>
+  const fetchCities = async () => {
+    try {
+      const response = await axios.get(CITIES_API_URL);
+      setCities(response.data.data);
+    } catch (error) {
+      console.error('Error fetching cities data', error);
+    }
+  };
 
-        <div className='col-span-3'>
-          <WeeklyForecast city={city} userType={userType} />
+  const handleCityChange = (e) => {
+    const value = e.target.value;
+    setCity(value);
+    if (value.trim() !== '') {
+      const filteredSuggestions = cities.filter((cityObj) =>
+        cityObj.city.toLowerCase().startsWith(value.toLowerCase())
+      );
+      setSuggestions(filteredSuggestions);
+    } else {
+      setSuggestions([]);
+    }
+  };
+
+  const handleSuggestionClick = (suggestedCity) => {
+    setCity(suggestedCity);
+    setSuggestions([]);
+  };
+
+  return (
+    <div className='flex justify-center bg-[#0B131E] font-gilroy'>
+      <div className='2xl:max-w-[1600px]'>
+        <div className="px-[1rem] md:px-[4rem] py-[2rem] bg-[#0B131E]">
+          <h1 className="text-4xl font-bold mb-10 text-[#DDE0E4]">Weather Dashboard</h1>
+          <div className='lg:grid grid-cols-8 gap-5'>
+            <div className='col-span-5'>
+              <UserSelector setUserType={setUserType} />
+              
+              <input
+                type="text"
+                value={city}
+                onChange={handleCityChange}
+                placeholder="Enter city"
+                className="p-2 text-[#9399A2] rounded-lg shadow-sm focus:ring mt-4 bg-[#202B3B] focus:ring-blue-300 w-full mb-6"
+              />
+              {suggestions.length > 0 && (
+                <CitySuggestions suggestions={suggestions} onSuggestionClick={handleSuggestionClick} />
+              )}
+              <PersonalStory />
+              {weatherData && (
+                <WeatherCard data={weatherData} userType={userType} />
+              )}
+              <TodayHighlights data={weatherData} />
+              <div className="mt-4 bg-[#202B3B] p-[2rem] rounded-md">
+                <h2 className="text-xl font-semibold mb-2 text-[#9399A2]">About {city}</h2>
+                <p className='text-[#9399A2]'>{cityInfo}</p>
+              </div>
+            </div>
+            <div className='col-span-3'>
+             
+             
+              
+              <WeeklyForecast city={city} userType={userType} />
+            </div>
+          </div>
         </div>
       </div>
     </div>
-      </div>
-      
-    </div>
-   
   );
 }
 
