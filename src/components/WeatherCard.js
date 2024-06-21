@@ -51,7 +51,7 @@ function WeatherCard({ data, userType }) {
       </div>
       {weatherIcon && (
         <div>
-          <img src={weatherIcon} alt="Weather Icon" className="w-24 h-24" />
+          <img src={weatherIcon} alt="Weather Icon" className="object-cover w-24 " />
         </div>
       )}
     </div>

@@ -112,7 +112,7 @@ function App() {
           <div className='lg:grid grid-cols-8 gap-5'>
             <div className='col-span-5'>
               <UserSelector setUserType={setUserType} />
-              
+
               <input
                 type="text"
                 value={city}
@@ -120,9 +120,12 @@ function App() {
                 placeholder="Enter city"
                 className="p-2 text-[#9399A2] rounded-lg shadow-sm focus:ring mt-4 bg-[#202B3B] focus:ring-blue-300 w-full mb-6"
               />
-              {suggestions.length > 0 && (
-                <CitySuggestions suggestions={suggestions} onSuggestionClick={handleSuggestionClick} />
-              )}
+              <div className='mb-[1rem]'>
+                {suggestions.length > 0 && (
+                  <CitySuggestions suggestions={suggestions} onSuggestionClick={handleSuggestionClick} />
+                )}
+              </div>
+
               <PersonalStory />
               {weatherData && (
                 <WeatherCard data={weatherData} userType={userType} />
@@ -134,9 +137,9 @@ function App() {
               </div>
             </div>
             <div className='col-span-3'>
-             
-             
-              
+
+
+
               <WeeklyForecast city={city} userType={userType} />
             </div>
           </div>

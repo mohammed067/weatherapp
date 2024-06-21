@@ -52,7 +52,7 @@ const WeeklyForecast = ({ city, userType }) => {
   };
 
   return (
-    <div className="mt-8 font-gilroy bg-[#202B3B] rounded-md p-[2rem] ">
+    <div className="mt-8 font-gilroy bg-[#202B3B] rounded-md px-4 py-4 ">
       <h2 className="text-2xl font-semibold mb-4 text-[#9399A2] ">Weekly Forecast</h2>
       {weeklyForecast.map((day, index) => (
         <div key={index} className="mb-4 p-4 rounded-lg border-b-[0.2px] shadow-sm gap-6 bg-[#202B3B] grid grid-cols-6">
